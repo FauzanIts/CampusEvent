@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Event API - Test Results</title>
+    <title>Campus Event API - Hasil Pengujian</title>
     <style>
         * {
             margin: 0;
@@ -113,22 +113,35 @@
             font-weight: bold;
         }
         
+        .test-suite-desc {
+            background: #e7f3ff;
+            padding: 12px 20px;
+            font-size: 13px;
+            color: #0056b3;
+            border-bottom: 1px solid #b8daff;
+        }
+        
         .test-list {
             padding: 20px;
         }
         
         .test-item {
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
             background: #f8f9fa;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
         }
         
         .test-item:last-child {
             margin-bottom: 0;
+        }
+        
+        .test-item-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
         }
         
         .test-item .check {
@@ -140,13 +153,60 @@
         .test-item .name {
             flex: 1;
             font-size: 14px;
-            color: #495057;
+            font-weight: 600;
+            color: #212529;
         }
         
         .test-item .duration {
             font-size: 12px;
             color: #6c757d;
             font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .test-item .description {
+            font-size: 13px;
+            color: #495057;
+            margin-top: 8px;
+            padding-left: 32px;
+            line-height: 1.5;
+        }
+        
+        .test-item .details {
+            margin-top: 10px;
+            padding-left: 32px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .test-item .detail-tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .tag-method {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .tag-endpoint {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .tag-status {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .tag-auth {
+            background: #f8d7da;
+            color: #721c24;
         }
         
         .footer {
@@ -163,7 +223,7 @@
     <div class="container">
         <div class="header">
             <h1>🎓 Campus Event API</h1>
-            <p>Hasil Pengujian Sistem - Eksekusi Test Suite</p>
+            <p>Hasil Pengujian Sistem - Dokumentasi Lengkap Test Cases</p>
         </div>
         
         <div class="summary">
@@ -189,31 +249,98 @@
                     <h2>Pengujian Autentikasi</h2>
                     <span class="badge">5 berhasil</span>
                 </div>
+                <div class="test-suite-desc">
+                    Menguji fitur registrasi dan login pengguna, validasi kredensial, serta penanganan error autentikasi
+                </div>
                 <div class="test-list">
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil mendaftarkan pengguna baru</span>
-                        <span class="duration">254ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Registrasi Pengguna Baru Berhasil</span>
+                            <span class="duration">254ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mengirim data registrasi (nama, email, password) ke endpoint register. 
+                            Hasil yang diharapkan: user tersimpan di database, password di-hash dengan bcrypt, 
+                            dan sistem mengembalikan JWT token beserta API key untuk autentikasi selanjutnya.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/auth/register</span>
+                            <span class="detail-tag tag-status">201 Created</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Tidak boleh mendaftar dengan email yang sama</span>
-                        <span class="duration">189ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Tolak Registrasi Email Duplikat</span>
+                            <span class="duration">189ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mencoba mendaftarkan email yang sudah terdaftar sebelumnya. 
+                            Hasil yang diharapkan: sistem menolak dengan status 400 Bad Request 
+                            dan pesan error "Email already registered" untuk mencegah duplikasi akun.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/auth/register</span>
+                            <span class="detail-tag tag-status">400 Bad Request</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil login dengan kredensial yang valid</span>
-                        <span class="duration">145ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Login dengan Kredensial Valid</span>
+                            <span class="duration">145ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mengirim email dan password yang valid ke endpoint login. 
+                            Hasil yang diharapkan: password diverifikasi dengan bcrypt, JWT token dibuat 
+                            dengan masa berlaku 24 jam, dan data user dikembalikan tanpa password.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/auth/login</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Tidak boleh login dengan password yang salah</span>
-                        <span class="duration">132ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Tolak Login dengan Password Salah</span>
+                            <span class="duration">132ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mencoba login dengan email valid tetapi password salah. 
+                            Hasil yang diharapkan: sistem menolak dengan status 401 Unauthorized 
+                            dan pesan "Invalid credentials" tanpa memberikan informasi spesifik field mana yang salah.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/auth/login</span>
+                            <span class="detail-tag tag-status">401 Unauthorized</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Tidak boleh login dengan email yang tidak terdaftar</span>
-                        <span class="duration">98ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Tolak Login Email Tidak Terdaftar</span>
+                            <span class="duration">98ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mencoba login dengan email yang tidak ada di database. 
+                            Hasil yang diharapkan: sistem menolak dengan status 401 Unauthorized 
+                            untuk mencegah enumeration attack (tidak memberitahu apakah email ada atau tidak).
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/auth/login</span>
+                            <span class="detail-tag tag-status">401 Unauthorized</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -225,51 +352,178 @@
                     <h2>Operasi CRUD Event</h2>
                     <span class="badge">9 berhasil</span>
                 </div>
+                <div class="test-suite-desc">
+                    Menguji operasi Create, Read, Update, Delete pada data event dengan validasi JWT dan API Key
+                </div>
                 <div class="test-list">
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil membuat event baru</span>
-                        <span class="duration">512ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Buat Event Baru dengan JWT</span>
+                            <span class="duration">512ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mengirim data event (title, description, date, location) dengan JWT token di header Authorization. 
+                            Hasil yang diharapkan: event tersimpan di MongoDB dengan createdBy = user ID dari token, 
+                            dan lokasi otomatis dikonversi ke koordinat GPS melalui Geocoding API.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/events</span>
+                            <span class="detail-tag tag-status">201 Created</span>
+                            <span class="detail-tag tag-auth">🔒 JWT Required</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Tidak boleh membuat event tanpa autentikasi</span>
-                        <span class="duration">87ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Tolak Buat Event Tanpa Token</span>
+                            <span class="duration">87ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mencoba membuat event tanpa menyertakan JWT token di header. 
+                            Hasil yang diharapkan: middleware AuthJwt memblokir request dengan status 401, 
+                            membuktikan endpoint terproteksi dengan baik dari akses tanpa autentikasi.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/events</span>
+                            <span class="detail-tag tag-status">401 Unauthorized</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil mendapatkan semua event</span>
-                        <span class="duration">560ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Ambil Semua Daftar Event</span>
+                            <span class="duration">560ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem meminta daftar semua event yang tersimpan di database dengan JWT token. 
+                            Hasil yang diharapkan: array berisi semua event dengan informasi lengkap 
+                            (id, title, description, date, location, coordinates, createdBy).
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/events</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                            <span class="detail-tag tag-auth">🔒 JWT Required</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil mendapatkan event berdasarkan ID</span>
-                        <span class="duration">703ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Ambil Detail Event by ID</span>
+                            <span class="duration">703ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem meminta detail satu event berdasarkan MongoDB ObjectId yang valid. 
+                            Hasil yang diharapkan: objek event lengkap termasuk informasi cuaca (jika ada) 
+                            dan data pembuat event untuk keperluan authorization.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/events/:id</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                            <span class="detail-tag tag-auth">🔒 JWT Required</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus mengembalikan 404 untuk event yang tidak ada</span>
-                        <span class="duration">544ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Respons 404 untuk Event Tidak Ada</span>
+                            <span class="duration">544ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem meminta event dengan ID yang tidak ada di database (valid ObjectId format tapi tidak exist). 
+                            Hasil yang diharapkan: status 404 Not Found dengan pesan "Event not found" 
+                            untuk memberikan feedback yang jelas kepada client.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/events/:id</span>
+                            <span class="detail-tag tag-status">404 Not Found</span>
+                            <span class="detail-tag tag-auth">🔒 JWT Required</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil mengupdate event</span>
-                        <span class="duration">785ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Update Event Berhasil</span>
+                            <span class="duration">785ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mengirim data update (title baru, location baru) ke event yang sudah ada. 
+                            Hasil yang diharapkan: data event di database ter-update, timestamp updatedAt diperbarui, 
+                            dan jika lokasi berubah, koordinat GPS di-update ulang via Geocoding API.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">PUT</span>
+                            <span class="detail-tag tag-endpoint">/events/:id</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                            <span class="detail-tag tag-auth">🔒 JWT Required</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil menghapus event dengan JWT dan API key</span>
-                        <span class="duration">985ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Hapus Event dengan Dual Authentication</span>
+                            <span class="duration">985ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem menghapus event dengan menyertakan JWT token DAN API key di header x-api-key. 
+                            Hasil yang diharapkan: event dihapus dari database setelah melewati 2 layer autentikasi 
+                            (AuthJwt middleware + ApiKey middleware) untuk keamanan maksimal pada operasi destructive.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">DELETE</span>
+                            <span class="detail-tag tag-endpoint">/events/:id</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                            <span class="detail-tag tag-auth">🔒 JWT + API Key</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Tidak boleh menghapus event tanpa API key</span>
-                        <span class="duration">634ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Tolak Hapus Tanpa API Key</span>
+                            <span class="duration">634ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mencoba menghapus event dengan JWT token valid TAPI tanpa API key di header. 
+                            Hasil yang diharapkan: middleware ApiKey memblokir dengan status 401, 
+                            membuktikan dual authentication berfungsi - JWT saja tidak cukup untuk delete.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">DELETE</span>
+                            <span class="detail-tag tag-endpoint">/events/:id</span>
+                            <span class="detail-tag tag-status">401 Unauthorized</span>
+                            <span class="detail-tag tag-auth">❌ Missing API Key</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil mencari event berdasarkan lokasi</span>
-                        <span class="duration">421ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Pencarian Event Berdasarkan Lokasi</span>
+                            <span class="duration">421ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mencari event dengan query parameter location (contoh: ?location=Jakarta). 
+                            Hasil yang diharapkan: array event yang lokasi-nya mengandung kata kunci pencarian, 
+                            menggunakan case-insensitive regex matching di MongoDB.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/events?location=...</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                            <span class="detail-tag tag-auth">🔒 JWT Required</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -281,21 +535,65 @@
                     <h2>Integrasi API Eksternal</h2>
                     <span class="badge">3 berhasil</span>
                 </div>
+                <div class="test-suite-desc">
+                    Menguji integrasi dengan OpenCage Geocoding API dan OpenWeather API untuk data lokasi dan cuaca
+                </div>
                 <div class="test-list">
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil membuat event dengan atau tanpa geocoding</span>
-                        <span class="duration">576ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Geocoding Otomatis saat Buat Event</span>
+                            <span class="duration">576ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem membuat event dengan lokasi "Bandung" dan mengecek apakah koordinat GPS terisi otomatis. 
+                            Hasil yang diharapkan: jika Geocoding API aktif, latitude dan longitude terisi; 
+                            jika tidak aktif, event tetap tersimpan tanpa koordinat (graceful degradation).
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">POST</span>
+                            <span class="detail-tag tag-endpoint">/events</span>
+                            <span class="detail-tag tag-status">201 Created</span>
+                            <span class="detail-tag tag-auth">🌍 OpenCage API</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus berhasil mendapatkan info cuaca untuk event dengan koordinat</span>
-                        <span class="duration">583ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Ambil Info Cuaca Event</span>
+                            <span class="duration">583ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem meminta informasi cuaca untuk event yang memiliki koordinat GPS. 
+                            Hasil yang diharapkan: data cuaca (temperature, humidity, wind speed, description) 
+                            dari OpenWeather API dan tersimpan ke dokumen event untuk caching.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/events/:id/weather</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                            <span class="detail-tag tag-auth">☀️ OpenWeather API</span>
+                        </div>
                     </div>
+                    
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus mengembalikan error untuk request cuaca pada event tanpa koordinat</span>
-                        <span class="duration">2s</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Error Handling Cuaca Tanpa Koordinat</span>
+                            <span class="duration">2s</span>
+                        </div>
+                        <div class="description">
+                            Sistem meminta cuaca untuk event yang TIDAK memiliki koordinat GPS (geocoding gagal atau tidak aktif). 
+                            Hasil yang diharapkan: status 400 Bad Request dengan pesan jelas 
+                            "Event does not have coordinates" agar client tahu perlu update lokasi event terlebih dahulu.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/events/:id/weather</span>
+                            <span class="detail-tag tag-status">400 Bad Request</span>
+                            <span class="detail-tag tag-auth">❌ No Coordinates</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -307,11 +605,26 @@
                     <h2>Pengujian API Dasar</h2>
                     <span class="badge">1 berhasil</span>
                 </div>
+                <div class="test-suite-desc">
+                    Menguji endpoint dasar untuk memastikan server berjalan dan merespons dengan benar
+                </div>
                 <div class="test-list">
                     <div class="test-item">
-                        <span class="check">✓</span>
-                        <span class="name">Harus mengembalikan pesan sambutan API</span>
-                        <span class="duration">3ms</span>
+                        <div class="test-item-header">
+                            <span class="check">✓</span>
+                            <span class="name">Health Check - API Welcome Message</span>
+                            <span class="duration">3ms</span>
+                        </div>
+                        <div class="description">
+                            Sistem mengakses endpoint root (/) tanpa autentikasi untuk mengecek status server. 
+                            Hasil yang diharapkan: respons JSON dengan message "CampusEvent API" 
+                            yang menandakan server aktif dan siap menerima request.
+                        </div>
+                        <div class="details">
+                            <span class="detail-tag tag-method">GET</span>
+                            <span class="detail-tag tag-endpoint">/</span>
+                            <span class="detail-tag tag-status">200 OK</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -319,7 +632,7 @@
         
         <div class="footer">
             <p><strong>Framework Pengujian Campus Event API</strong> • Didukung oleh Japa Test Runner • AdonisJS v6</p>
-            <p style="margin-top: 8px;">Test dijalankan dengan sukses pada Desember 2024</p>
+            <p style="margin-top: 8px;">Test dijalankan dengan sukses pada Desember 2025</p>
         </div>
     </div>
 </body>
