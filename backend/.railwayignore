@@ -1,7 +1,0 @@
-node_modules
-.env
-.git
-tmp
-*.log
-coverage
-.DS_Store
