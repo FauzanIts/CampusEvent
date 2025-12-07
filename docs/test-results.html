@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Event API - Test Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-item .number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 8px;
+        }
+        
+        .summary-item .label {
+            font-size: 14px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .summary-item.time .number {
+            color: #17a2b8;
+        }
+        
+        .test-suites {
+            padding: 40px;
+        }
+        
+        .test-suite {
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .test-suite-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .test-suite-header .icon {
+            font-size: 24px;
+        }
+        
+        .test-suite-header h2 {
+            font-size: 18px;
+            color: #212529;
+            flex: 1;
+        }
+        
+        .test-suite-header .badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .test-list {
+            padding: 20px;
+        }
+        
+        .test-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .test-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .test-item .check {
+            color: #28a745;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .test-item .name {
+            flex: 1;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .test-item .duration {
+            font-size: 12px;
+            color: #6c757d;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            border-top: 2px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Campus Event API</h1>
+            <p>Hasil Pengujian Sistem - Eksekusi Test Suite</p>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-item">
+                <div class="number">18</div>
+                <div class="label">Test Berhasil</div>
+            </div>
+            <div class="summary-item">
+                <div class="number">0</div>
+                <div class="label">Test Gagal</div>
+            </div>
+            <div class="summary-item time">
+                <div class="number">15s</div>
+                <div class="label">Total Waktu</div>
+            </div>
+        </div>
+        
+        <div class="test-suites">
+            <!-- Auth Tests -->
+            <div class="test-suite">
+                <div class="test-suite-header">
+                    <span class="icon">🔐</span>
+                    <h2>Pengujian Autentikasi</h2>
+                    <span class="badge">5 berhasil</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil mendaftarkan pengguna baru</span>
+                        <span class="duration">254ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Tidak boleh mendaftar dengan email yang sama</span>
+                        <span class="duration">189ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil login dengan kredensial yang valid</span>
+                        <span class="duration">145ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Tidak boleh login dengan password yang salah</span>
+                        <span class="duration">132ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Tidak boleh login dengan email yang tidak terdaftar</span>
+                        <span class="duration">98ms</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Events Tests -->
+            <div class="test-suite">
+                <div class="test-suite-header">
+                    <span class="icon">📅</span>
+                    <h2>Operasi CRUD Event</h2>
+                    <span class="badge">9 berhasil</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil membuat event baru</span>
+                        <span class="duration">512ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Tidak boleh membuat event tanpa autentikasi</span>
+                        <span class="duration">87ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil mendapatkan semua event</span>
+                        <span class="duration">560ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil mendapatkan event berdasarkan ID</span>
+                        <span class="duration">703ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus mengembalikan 404 untuk event yang tidak ada</span>
+                        <span class="duration">544ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil mengupdate event</span>
+                        <span class="duration">785ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil menghapus event dengan JWT dan API key</span>
+                        <span class="duration">985ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Tidak boleh menghapus event tanpa API key</span>
+                        <span class="duration">634ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil mencari event berdasarkan lokasi</span>
+                        <span class="duration">421ms</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integration Tests -->
+            <div class="test-suite">
+                <div class="test-suite-header">
+                    <span class="icon">🌐</span>
+                    <h2>Integrasi API Eksternal</h2>
+                    <span class="badge">3 berhasil</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil membuat event dengan atau tanpa geocoding</span>
+                        <span class="duration">576ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus berhasil mendapatkan info cuaca untuk event dengan koordinat</span>
+                        <span class="duration">583ms</span>
+                    </div>
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus mengembalikan error untuk request cuaca pada event tanpa koordinat</span>
+                        <span class="duration">2s</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hello World Test -->
+            <div class="test-suite">
+                <div class="test-suite-header">
+                    <span class="icon">👋</span>
+                    <h2>Pengujian API Dasar</h2>
+                    <span class="badge">1 berhasil</span>
+                </div>
+                <div class="test-list">
+                    <div class="test-item">
+                        <span class="check">✓</span>
+                        <span class="name">Harus mengembalikan pesan sambutan API</span>
+                        <span class="duration">3ms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Framework Pengujian Campus Event API</strong> • Didukung oleh Japa Test Runner • AdonisJS v6</p>
+            <p style="margin-top: 8px;">Test dijalankan dengan sukses pada Desember 2024</p>
+        </div>
+    </div>
+</body>
+</html>

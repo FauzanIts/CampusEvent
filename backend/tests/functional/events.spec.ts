@@ -1,44 +1,44 @@
 import { test } from '@japa/runner'
 
-test.group('Events', (group) => {
-  let authToken: string
-  let apiKey: string
-  let testEmail: string
+/**
+ * Helper function: Create authenticated user dan return token + apiKey
+ */
+async function createAuthenticatedUser(client: any) {
+  const testEmail = `eventtest${Date.now()}@example.com`
 
-  /**
-   * Setup: Register & Login user untuk mendapatkan token
-   * Token diperlukan untuk semua endpoints events
-   */
-  group.setup(async ({ client }) => {
-    testEmail = `eventtest${Date.now()}@example.com`
+  // Register user
+  const registerResponse = await client
+    .post('/auth/register')
+    .json({
+      name: 'Event Test User',
+      email: testEmail,
+      password: 'password123'
+    })
 
-    // Register user untuk testing
-    const registerResponse = await client
-      .post('/auth/register')
-      .json({
-        name: 'Event Test User',
-        email: testEmail,
-        password: 'password123'
-      })
+  const apiKey = registerResponse.body().user.apiKey
 
-    apiKey = registerResponse.body().user.apiKey
+  // Login to get token
+  const loginResponse = await client
+    .post('/auth/login')
+    .json({
+      email: testEmail,
+      password: 'password123'
+    })
 
-    // Login untuk mendapatkan token
-    const loginResponse = await client
-      .post('/auth/login')
-      .json({
-        email: testEmail,
-        password: 'password123'
-      })
+  const token = loginResponse.body().token
 
-    authToken = loginResponse.body().token
-  })
+  return { token, apiKey, email: testEmail }
+}
+
+test.group('Events', () => {
 
   /**
    * Test Case 6: Create Event - Success
    * Memastikan user dapat membuat event baru dengan data yang valid
    */
   test('should create new event successfully', async ({ client, assert }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     const eventData = {
       title: 'Seminar Teknologi',
       description: 'Seminar tentang AI dan Machine Learning',
@@ -48,7 +48,7 @@ test.group('Events', (group) => {
 
     const response = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json(eventData)
 
     response.assertStatus(201)
@@ -59,9 +59,6 @@ test.group('Events', (group) => {
     assert.equal(body.description, eventData.description)
     assert.equal(body.location, eventData.location)
     assert.exists(body.createdBy)
-    
-    // Simpan eventId untuk test berikutnya
-    eventId = body._id
   })
 
   /**
@@ -69,6 +66,8 @@ test.group('Events', (group) => {
    * Memastikan system menolak pembuatan event tanpa field yang wajib
    */
   test('should not create event with missing fields', async ({ client }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     const incompleteData = {
       title: 'Incomplete Event'
       // Missing: description, date, location
@@ -76,7 +75,7 @@ test.group('Events', (group) => {
 
     const response = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json(incompleteData)
 
     response.assertStatus(400)
@@ -105,9 +104,11 @@ test.group('Events', (group) => {
    * Memastikan user dapat mengambil list semua events
    */
   test('should get all events successfully', async ({ client, assert }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     const response = await client
       .get('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
 
     response.assertStatus(200)
     
@@ -126,10 +127,12 @@ test.group('Events', (group) => {
    * Memastikan user dapat mengambil detail event berdasarkan ID
    */
   test('should get event by ID successfully', async ({ client, assert }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     // Buat event baru untuk test ini
     const createResponse = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json({
         title: 'Event for Get Test',
         description: 'Test description',
@@ -142,7 +145,7 @@ test.group('Events', (group) => {
     // Get event by ID
     const response = await client
       .get(`/events/${createdEventId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
 
     response.assertStatus(200)
     
@@ -156,11 +159,13 @@ test.group('Events', (group) => {
    * Memastikan system mengembalikan 404 untuk event yang tidak ada
    */
   test('should return 404 for non-existent event', async ({ client }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     const fakeId = '507f1f77bcf86cd799439011' // Valid MongoDB ObjectId format
 
     const response = await client
       .get(`/events/${fakeId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
 
     response.assertStatus(404)
     response.assertBodyContains({ message: 'Event not found' })
@@ -171,10 +176,12 @@ test.group('Events', (group) => {
    * Memastikan user dapat mengupdate event yang ada
    */
   test('should update event successfully', async ({ client, assert }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     // Buat event baru untuk test update
     const createResponse = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json({
         title: 'Event to Update',
         description: 'Original description',
@@ -192,7 +199,7 @@ test.group('Events', (group) => {
 
     const response = await client
       .put(`/events/${eventToUpdateId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json(updateData)
 
     response.assertStatus(200)
@@ -208,10 +215,12 @@ test.group('Events', (group) => {
    * Memastikan user dapat menghapus event dengan JWT token dan API key
    */
   test('should delete event successfully with JWT and API key', async ({ client }) => {
+    const { token, apiKey } = await createAuthenticatedUser(client)
+    
     // Buat event baru untuk test delete
     const createResponse = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json({
         title: 'Event to Delete',
         description: 'This will be deleted',
@@ -224,7 +233,7 @@ test.group('Events', (group) => {
     // Delete event dengan JWT + API Key
     const response = await client
       .delete(`/events/${eventToDeleteId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .header('x-api-key', apiKey)
 
     response.assertStatus(200)
@@ -233,7 +242,7 @@ test.group('Events', (group) => {
     // Verify event sudah terhapus
     const getResponse = await client
       .get(`/events/${eventToDeleteId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
 
     getResponse.assertStatus(404)
   })
@@ -243,10 +252,12 @@ test.group('Events', (group) => {
    * Memastikan delete memerlukan API key tambahan
    */
   test('should not delete event without API key', async ({ client }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     // Buat event baru
     const createResponse = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json({
         title: 'Event for API Key Test',
         description: 'Test description',
@@ -259,7 +270,7 @@ test.group('Events', (group) => {
     // Coba delete hanya dengan JWT (tanpa API Key)
     const response = await client
       .delete(`/events/${eventToDeleteId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
 
     response.assertStatus(401)
   })

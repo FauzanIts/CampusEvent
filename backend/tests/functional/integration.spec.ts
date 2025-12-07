@@ -1,53 +1,41 @@
 import { test } from '@japa/runner'
 
-test.group('External API Integration', (group) => {
-  let authToken: string
-  let eventWithCoordinates: string
-  let testEmail: string
+/**
+ * Helper function: Create authenticated user dan return token
+ */
+async function createAuthenticatedUser(client: any) {
+  const testEmail = `integration${Date.now()}@example.com`
 
-  /**
-   * Setup: Register & Login, lalu buat event dengan coordinates
-   */
-  group.setup(async ({ client }) => {
-    testEmail = `integration${Date.now()}@example.com`
+  // Register user
+  const registerResponse = await client
+    .post('/auth/register')
+    .json({
+      name: 'Integration Test User',
+      email: testEmail,
+      password: 'password123'
+    })
 
-    // Register & Login
-    const registerResponse = await client
-      .post('/auth/register')
-      .json({
-        name: 'Integration Test User',
-        email: testEmail,
-        password: 'password123'
-      })
+  // Login to get token
+  const loginResponse = await client
+    .post('/auth/login')
+    .json({
+      email: testEmail,
+      password: 'password123'
+    })
 
-    const loginResponse = await client
-      .post('/auth/login')
-      .json({
-        email: testEmail,
-        password: 'password123'
-      })
+  const token = loginResponse.body().token
+  return { token, email: testEmail }
+}
 
-    authToken = loginResponse.body().token
-
-    // Buat event dengan location untuk geocoding
-    const eventResponse = await client
-      .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
-      .json({
-        title: 'Event with Coordinates',
-        description: 'This event should have coordinates',
-        date: '2025-12-15',
-        location: 'Jakarta, Indonesia'
-      })
-
-    eventWithCoordinates = eventResponse.body()._id
-  })
+test.group('External API Integration', () => {
 
   /**
    * Test Case 15: Geocoding Integration - Event Creation
    * Memastikan event dibuat dengan/tanpa coordinates (geocoding optional)
    */
   test('should create event with or without geocoding', async ({ client, assert }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     const eventData = {
       title: 'Geocoding Test Event',
       description: 'Testing geocoding integration',
@@ -57,7 +45,7 @@ test.group('External API Integration', (group) => {
 
     const response = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json(eventData)
 
     response.assertStatus(201)
@@ -80,12 +68,21 @@ test.group('External API Integration', (group) => {
    * Note: Test ini akan skip jika event tidak punya coordinates
    */
   test('should get weather info for event with coordinates', async ({ client, assert }) => {
-    // Get event terlebih dahulu untuk cek apakah ada coordinates
-    const eventResponse = await client
-      .get(`/events/${eventWithCoordinates}`)
-      .header('Authorization', `Bearer ${authToken}`)
+    const { token } = await createAuthenticatedUser(client)
+    
+    // Buat event dengan location yang kemungkinan punya coordinates
+    const createResponse = await client
+      .post('/events')
+      .header('Authorization', `Bearer ${token}`)
+      .json({
+        title: 'Event with Coordinates',
+        description: 'This event should have coordinates',
+        date: '2025-12-15',
+        location: 'Jakarta, Indonesia'
+      })
 
-    const event = eventResponse.body()
+    const eventId = createResponse.body()._id
+    const event = createResponse.body()
 
     if (!event.latitude || !event.longitude) {
       // Skip test jika event tidak punya coordinates
@@ -96,8 +93,8 @@ test.group('External API Integration', (group) => {
 
     // Get weather info
     const response = await client
-      .get(`/events/${eventWithCoordinates}/weather`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .get(`/events/${eventId}/weather`)
+      .header('Authorization', `Bearer ${token}`)
 
     // Jika OpenWeather API key valid, akan success
     // Jika tidak, akan dapat error 500 atau 400
@@ -118,10 +115,12 @@ test.group('External API Integration', (group) => {
    * Memastikan weather API mengembalikan error untuk event tanpa coordinates
    */
   test('should return error for weather request on event without coordinates', async ({ client }) => {
+    const { token } = await createAuthenticatedUser(client)
+    
     // Buat event baru yang pasti tidak punya coordinates
     const createResponse = await client
       .post('/events')
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
       .json({
         title: 'Event Without Coordinates',
         description: 'No coordinates here',
@@ -137,7 +136,7 @@ test.group('External API Integration', (group) => {
     // Get event untuk verify tidak ada coordinates
     const eventResponse = await client
       .get(`/events/${eventId}`)
-      .header('Authorization', `Bearer ${authToken}`)
+      .header('Authorization', `Bearer ${token}`)
 
     const event = eventResponse.body()
 
@@ -145,7 +144,7 @@ test.group('External API Integration', (group) => {
     if (!event.latitude || !event.longitude) {
       const response = await client
         .get(`/events/${eventId}/weather`)
-        .header('Authorization', `Bearer ${authToken}`)
+        .header('Authorization', `Bearer ${token}`)
 
       response.assertStatus(400)
       response.assertBodyContains({ message: 'Event has no coordinates' })
