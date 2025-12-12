@@ -5,6 +5,7 @@ export interface IEvent extends Document {
   title: string
   description: string
   date: Date
+  time?: string
   location: string
   latitude?: number
   longitude?: number
@@ -16,6 +17,7 @@ const EventSchema = new Schema<IEvent>({
   title: { type: String, required: true },
   description: { type: String },
   date: { type: Date, required: true },
+  time: { type: String },
   location: { type: String, required: true },
   latitude: { type: Number },
   longitude: { type: Number },

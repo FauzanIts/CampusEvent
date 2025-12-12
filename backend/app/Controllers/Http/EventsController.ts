@@ -116,10 +116,11 @@ export default class EventsController {
     }
 
     try {
-      const { title, description, date, location } = request.only([
+      const { title, description, date, time, location } = request.only([
         'title',
         'description',
         'date',
+        'time',
         'location',
       ])
 
@@ -150,6 +151,7 @@ export default class EventsController {
         title,
         description,
         date,
+        time,
         location,
         latitude: geo?.lat,
         longitude: geo?.lng,
@@ -261,16 +263,18 @@ export default class EventsController {
       const event = await EventModel.findById(params.id)
       if (!event) return response.notFound({ message: 'Event not found' })
 
-      const { title, description, date, location } = request.only([
+      const { title, description, date, time, location } = request.only([
         'title',
         'description',
         'date',
+        'time',
         'location',
       ])
 
       if (title !== undefined) event.title = title
       if (description !== undefined) event.description = description
       if (date !== undefined) event.date = date
+      if (time !== undefined) event.time = time
       if (location !== undefined) {
         event.location = location
         const geo = await GeocodingService.geocode(location)

@@ -1,5 +1,7 @@
 // src/pages/Login.tsx
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Mail, Lock, GraduationCap, AlertCircle } from 'lucide-react'
 import api from '../api'
 
 export default function Login() {
@@ -13,91 +15,98 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    // Clear old tokens first
     localStorage.removeItem('token')
     localStorage.removeItem('user')
 
     try {
-      console.log('[Login] Attempting login for:', email)
       const res = await api.post('/auth/login', { email, password })
-      
-      console.log('[Login] Login successful')
-      console.log('[Login] Token:', res.data.token?.substring(0, 20) + '...')
-      console.log('[Login] User:', res.data.user)
-      
-      // Store token and user data
       localStorage.setItem('token', res.data.token)
       localStorage.setItem('user', JSON.stringify(res.data.user))
-
-      console.log('[Login] Credentials stored, redirecting...')
-      
-      // Redirect to events page
       window.location.href = '/events'
     } catch (err: any) {
-      console.error('LOGIN ERROR:', err)
-      
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'Login failed. Please try again.'
-      
-      setError(errorMessage)
+      setError(err.response?.data?.message || 'Gagal masuk. Silakan coba lagi.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow p-6 mt-12 rounded">
-      <h1 className="text-xl font-bold mb-4">Login</h1>
-      
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+    <div className="flex min-h-[calc(100vh-56px)] items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white">
+            <GraduationCap className="h-6 w-6" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900">Selamat Datang</h1>
+          <p className="mt-2 text-sm text-slate-500">Masuk untuk mengelola acara kampus Anda</p>
         </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+
+        {error && (
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">Email</label>
+            <div className="relative">
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <Mail className="h-5 w-5" />
+              </span>
+              <input
+                type="email"
+                placeholder="nama@email.com"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm transition focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-slate-700">Password</label>
+            <div className="relative">
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <Lock className="h-5 w-5" />
+              </span>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm transition focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="mt-2 flex h-12 w-full items-center justify-center rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60"
             disabled={loading}
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Password</label>
-          <input
-            className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-        
-        <button
-          type="submit"
-          className="w-full bg-slate-800 text-white py-2 rounded hover:bg-slate-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      
-      <p className="text-center mt-4 text-sm text-gray-600">
-        Don't have an account?{' '}
-        <a href="/register" className="text-blue-600 hover:underline">
-          Register here
-        </a>
-      </p>
+          >
+            {loading ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            ) : (
+              'Masuk ke Akun'
+            )}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Belum punya akun?{' '}
+          <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-700">
+            Daftar sekarang
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }
